@@ -1,0 +1,16 @@
+---
+postgres:
+  adapter: postgresql
+  database: ror_polymorphism_benchmarks
+
+sqlite3:
+  adapter: sqlite
+  database: db/sqlite3.db
+
+mysql:
+  adapter: mysql
+  database: ror_polymorphism_benchmarks
+  user: root
+  password: gr33nEggs
+
+
