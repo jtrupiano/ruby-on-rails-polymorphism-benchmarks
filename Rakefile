@@ -1,7 +1,10 @@
 require 'active_record'  
-require 'yaml'  
+require 'yaml'
 
 task :default => :migrate  
+
+# Dir.glob(File.join("models", "*.rb")) { |f| require f }
+Dir.glob(File.join("lib", "*.rb")) { |f| require f }
 
 namespace :db do
 
@@ -9,10 +12,27 @@ namespace :db do
   task :migrate => :environment do 
     ActiveRecord::Migrator.migrate('db/migrate', ENV["VERSION"] ? ENV["VERSION"].to_i : nil )  
   end  
+
+  desc 'Create all the local databases defined in config/database.yml'
+  task :create do
+    ActiveRecord::Base.logger = Logger.new(File.open('log/database.log', 'a'))
+    db = Db.new('db/dbs.yml')
+    db.server_keys.each do |key|
+      config = db.config(key)
+      ActiveRecord::Base.establish_connection(config)
+      create_database(config)
+    end
+  end
   
-  desc "Create the database"
-  task :create => :environment do
-    create_database(db_config)
+  namespace :drop do
+    desc 'Drops all the local databases defined in config/database.yml'
+    task :all => :environment do
+      ActiveRecord::Base.configurations.each_value do |config|
+        # Skip entries that don't have a database key
+        next unless config['database']
+        drop_database(config)
+      end
+    end
   end
   
   desc "Drops the database"
@@ -31,13 +51,13 @@ namespace :db do
   
 end
 
-task :environment do  
+task :environment do
   ActiveRecord::Base.establish_connection(db_config)  
   ActiveRecord::Base.logger = Logger.new(File.open('log/database.log', 'a'))  
 end  
 
 def db_config
-  YAML::load(File.open('db/dbs.yml'))[ENV['RAILS_ENV'] || 'mysql']
+  YAML::load(File.open('db/dbs.yml'))
 end
 
 # pulled from rails-2.0.2/lib/tasks/databases.rake
