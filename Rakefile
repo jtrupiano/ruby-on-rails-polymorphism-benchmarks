@@ -24,20 +24,15 @@ namespace :db do
     end
   end
   
-  namespace :drop do
-    desc 'Drops all the local databases defined in config/database.yml'
-    task :all => :environment do
-      ActiveRecord::Base.configurations.each_value do |config|
-        # Skip entries that don't have a database key
-        next unless config['database']
-        drop_database(config)
-      end
+  desc 'Drops all the local databases defined in config/database.yml'
+  task :drop do
+    ActiveRecord::Base.logger = Logger.new(File.open('log/database.log', 'a'))
+    db = Db.new('db/dbs.yml')
+    db.server_keys.each do |key|
+      config = db.config(key)
+      ActiveRecord::Base.establish_connection(config)
+      drop_database(config)
     end
-  end
-  
-  desc "Drops the database"
-  task :drop => :environment do
-    ActiveRecord::Base.connection.execute("DROP DATABASE #{db_config['database']};")
   end
   
   desc "Loads in test data"
@@ -86,6 +81,18 @@ def create_database(config)
     end
   else
     p "#{config['database']} already exists"
+  end
+end
+
+def drop_database(config)
+  case config['adapter']
+  when 'mysql'
+    ActiveRecord::Base.connection.drop_database config['database']
+  when /^sqlite/
+    FileUtils.rm('db/sqlite3.db')
+  when 'postgresql'
+    ActiveRecord::Base.establish_connection(config.merge('database' => 'postgres', 'schema_search_path' => 'public'))
+    ActiveRecord::Base.connection.drop_database config['database']
   end
 end
 
