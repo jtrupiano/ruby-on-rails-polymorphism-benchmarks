@@ -1,9 +1,8 @@
-require 'test_helper'
-require 'benchmark'
+class IntAssocIndTest
+  extend Benchmark
+  extend TestHelper
 
-class IntAssocIndTest < ActiveSupport::TestCase
-  include Benchmark
-  def test_benchmark
+  def self.run_benchmark
     items_to_insert = build_items_list(int_types)
     items_in_db = []
     

@@ -1,13 +1,7 @@
 ---
-#postgres:
-#  adapter: postgresql
-#  database: ror_polymorphism_benchmarks
-#  username: postgres
-#  password: gr33nEggs
-
 sqlite3:
   adapter: sqlite3
-  database: db/sqlite3.db
+  database: db/ror_polymorphism_benchmarks.db
 
 mysql:
   adapter: mysql
@@ -16,4 +10,8 @@ mysql:
   password: gr33nEggs
   socket: /var/run/mysqld/mysqld.sock
 
-
+#postgres:
+#  adapter: postgresql
+#  database: ror_polymorphism_benchmarks
+#  username: postgres
+#  password: gr33nEggs
