@@ -1,18 +1,39 @@
 Ruby on Rails Polymorphic Relation Benchmarking
 Nick Gauthier (nick@smartlogicsolutions.com)
+John Trupiano (john@smartlogicsolutions.com)
 
 I created this app to test the polymorphic relationships in rails.
 
 Specifically, I wanted to know if using strings for comparison was slower
 than using a manual linking table via integers.
 
-I created four linking tables, two with strings and two with integers.
-One of each type has an index on the type, the other does not.
+The current implementation includes four test scenarios for polymorphic tables:
+1) integer
+2) integer w/ index
+3) string (as rails does it)
+4) string w/ index (which you can add)
 
-Please expand upon my benchmarks to find the fastest way possible to create and
-(more importantly) find these links.
+It currently supports mysql, sqlite3 and possibly postgres (not fully tested).  Whatever you
+have defined in db/dbs.yml will get loaded and run against, allowing you to test more than
+one DBMS at a single time.
 
-Edit the file test/test_helper.rb to set parameters. Run with "rake"
+==========
+Rake Tasks
+==========
+
+# rake db:create
+Reads in databases from db/dbs.yml and creates them
+
+# rake db:drop
+Reads in databases from db/dbs.yml and drops them
+
+# rake db:migrate
+Runs migrations on all databases in db/dbs.yml
+
+# rake db:reload
+create -> drop -> migrate
+
+# rake run (default)
+Runs the simulations
 
 
--Nick
